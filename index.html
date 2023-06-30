@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Project!</title>
+    <!-- Styling for the client UI -->
+    <style>
+    h1 {
+        color: #FFFFFF;
+        font-family: system-ui;
+        margin-left: 20px;
+    }
+    body {
+        background-color: #427ead;
+    }
+    label {
+        color: #86C232;
+        font-family: system-ui;
+        font-size: 20px;
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+    button {
+        background-color: #86C232;
+        border-color: #86C232;
+        color: #FFFFFF;
+        font-family: system-ui;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 30px;
+        margin-top: 20px;
+        width: 140px;
+    }
+    input {
+        color: #427ead;
+        font-family: system-ui;
+        font-size: 20px;
+        margin-left: 10px;
+        margin-top: 20px;
+        width: 100px;
+    }
+    #documentation {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #FFFFFF;
+            color: #000000;
+            font-family: system-ui;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        // callAPI function that takes the base and exponent numbers as parameters
+        var callAPI = (base, exponent) => {
+            // instantiate a headers object
+            var myHeaders = new Headers();
+            // add content type header to object
+            myHeaders.append("Content-Type", "application/json");
+            // using built in JSON utility package turn object to string and store in a variable
+            var raw = JSON.stringify({ "base": base, "exponent": exponent });
+            // create a JSON object with parameters for API call and store in a variable
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+            // make API call with parameters and use promises to get response
+            fetch("https://0z3yg0h9d0.execute-api.us-east-1.amazonaws.com/dev", requestOptions)
+                .then(response => response.text())
+                .then(result => {
+                    // Update the content of the resultDiv with the result
+                    document.getElementById('resultDiv').textContent = JSON.parse(result).body;
+                })
+                .catch(error => console.log('error', error));
+        }
+        function toggleDocumentation() {
+            var documentation = document.getElementById('documentation');
+            documentation.style.display = (documentation.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</head>
+<body>
+    <h1>TO THE POWER OF MATH!</h1>
+    <form>
+        <label>Base number:</label>
+        <input type="text" id="base">
+        <label>...to the power of:</label>
+        <input type="text" id="exponent">
+        <!-- set button onClick method to call function we defined passing input values as parameters -->
+        <button type="button" onclick="callAPI(document.getElementById('base').value,document.getElementById('exponent').value)">CALCULATE</button>
+    </form>
+    <!-- Div to display the result -->
+    <div id="resultDiv"></div>
+
+    <button type="button" onclick="toggleDocumentation()">Show/Hide Project Documentation</button>
+
+    <!-- Project Documentation -->
+    <div id="documentation">
+        <h2>Project Documentation</h2>
+        <p>
+            <strong>Front-end Web Application (index.html):</strong>
+            No specific AWS IAM roles are required for the front-end web application. However, appropriate permissions should be set on AWS resources that the application interacts with (e.g., API Gateway endpoints).
+        </p>
+        <p>
+            <strong>AWS Amplify:</strong>
+            Amplify Hosting Role: This IAM role is used by AWS Amplify to deploy and host the web application. It typically requires permissions to interact with Amazon S3 and CloudFront.
+        </p>
+        <p>
+            <strong>Lambda Function (Python):</strong>
+            Lambda Execution Role: The IAM role associated with the Lambda function requires permissions to execute the Lambda function code and access the necessary resources.
+            DynamoDB Write Role: To write the math results to DynamoDB, the Lambda function should have an IAM role with permissions to write to the DynamoDB table.
+        </p>
+        <p>
+            <strong>API Gateway:</strong>
+            Lambda Execution Role: The IAM role associated with the Lambda function requires permissions to execute the Lambda function code and access the necessary resources.
+            DynamoDB Write Role: To write the math results to DynamoDB, the Lambda function should have an IAM role with permissions to write to the DynamoDB table.
+        </p>
+        <p>
+            <strong>Lambda Function (Python):</strong>
+            API Gateway Execution Role: This IAM role is associated with the API Gateway service and is responsible for executing the API Gateway endpoints and invoking the associated Lambda function.
+            DynamoDB Access Role: If the API Gateway needs to access the DynamoDB table directly (e.g., for reading or writing), it should have an IAM role with the necessary permissions to interact with DynamoDB.
+        </p>
+        <p>
+            <strong>DynamoDB:</strong>
+            DynamoDB Access Role: This IAM role is assigned to the resources (e.g., Lambda function, API Gateway) that need to interact with DynamoDB. It should have the appropriate permissions to read from and write to the DynamoDB table.
+        </p>
+    </div>
+</body>
+</html>
